@@ -1,0 +1,204 @@
+# Google Analytics for Rails
+
+Source: [GitHub](https://github.com/sklppr/google_analytics_helper)  
+
+Author: [@sklppr](https://twitter.com/sklppr)
+
+
+## Basic Functionality
+
+### Commands
+
+All commands are stored in the Google Analytics Queue (GAQ) accessible via `gaq`.  
+It’s simply an `Array`, so you can add commands with `gaq.push(...)`, clear it with `gaq.clear` etc.
+
+Commands are added using [asynchronous syntax](http://code.google.com/apis/analytics/docs/tracking/asyncUsageGuide.html#Syntax):
+
+* method calls: `["_methodName"]`
+* method calls with parameters: `["_methodName", "param", 123]`
+* anonymous functions: `"function() {}"`
+
+You can add multiple commands in one go:
+
+    gaq.push(["_someMethod"], ["_anotherMethod", "param", 123], "function() {}")
+
+
+### Embedding The Snippet
+
+Using `ga_snippet` in your layout will embed an
+[optimized version](http://mathiasbynens.be/notes/async-analytics-snippet) of the
+[aynchronous snippet](http://code.google.com/apis/analytics/docs/tracking/asyncTracking.html).
+
+
+### Configuration
+
+To set things up, simply specify your Google Analytics ID in the Rails config:
+
+    config.google_analytics_id = "UA-XXXXXXXX-XX"
+
+The snippet will then contain the following commands by default: `_setAccount`, `_trackPageview`, `_trackPageLoadTime`  
+If you need to override this, you can do so by providing a set of default commands:
+
+    config.google_analytics_commands = [["_setAccount", "UA-XXXXXXXX-XX"], ["_trackPageview"]]
+
+If you specify default commands, you don’t need to specify your ID separately. Just remember to include `_setAccount`.  
+You can make those settings global or environment specific. If you don’t specify either (in one environment), the snippet will not appear (in that environment).
+
+_**Note:** Even if you don't configure GA, all tracking functionality (i.e. pushing and preserving commands) will still work and you can debug it. However, instead of the snippet rendering, the GAQ will simply be cleared at the end of a request._
+
+### Preserving Commands
+
+You can preserve your commands across redirects very easily:
+
+1. Preserve the GAQ right before a `redirect_to` using `gaq_preserve`.
+2. Then restore the GAQ after the redirect with `gaq_restore`.
+
+
+## Recommended Setup
+
+### Controllers
+
+Include the helper and set up filters to automate preservation of unrendered commands (even across multiple subsequent redirects):
+
+    include GoogleAnalyticsHelper
+    before_filter :gaq_restore
+    after_filter :gaq_preserve
+
+
+### Views
+
+Tracking functionality can be used right away. You can embed the snippet like this:
+
+    <%= ga_snippet %>
+
+
+### Models
+
+To track from within model objects, include the helper in the model class:
+
+    include GoogleAnalyticsHelper
+
+Since only the GAQ residing in the controller/view will be rendered into the snippet, you need to pass it to the model before doing anything else:
+
+    @model = Model.new
+    @model.gaq = gaq
+    @model.do_something
+
+You can also retroactively extract the model’s internal GAQ:
+
+    @model = Model.new
+    @model.do_something
+    gaq.concat(@model.gaq)
+
+
+## Debugging
+
+The [debug version of Google Analytics](http://code.google.com/apis/analytics/docs/tracking/gaTrackingTroubleshooting.html#gaDebug) will be automatically loaded in _development environment_ or if you specify this in your config:
+
+    config.google_analytics_debug = true
+
+This debug version will log each tracking request as well as warning and error messages to the console. You can open the console like this:
+
+* On Windows and Linux, click **_Page Icon_** → **Developer** → **Javascript** console or press `Ctrl`+`⇧`+`J`.
+* On Mac, click **View** → **Developer** → **Javascript** console or press `⌘`+`⌥`+`J`.
+
+Alternatively, you can install the [Google Analytics Tracking Code Debugger](https://chrome.google.com/extensions/detail/jnkmfdileelhofjcijamephohjechhna) for [Google Chrome](http://www.google.com/chrome).
+
+## Google Analytics Tracking Code
+
+For maximum convenience, all of the [Google Analytics Tracking Code (GATC)](http://code.google.com/apis/analytics/docs/gaJS/gaJSApi.html) commands are directly available, so you can do `_trackEvent(...)` instead of `gaq.push(["_trackEvent", ...])`.
+
+Optional parameters can be omitted or skipped using `nil`:
+
+    _trackEvent("Category", "Action")
+    _trackEvent("Category", "Action", "Label")
+    _trackEvent("Category", "Action", nil, 123)
+
+Here’s a quick overview of what’s available:
+
+* [Basic Configuration](http://code.google.com/apis/analytics/docs/gaJS/gaJSApiBasicConfiguration.html)
+* [Campaign Tracking](http://code.google.com/apis/analytics/docs/gaJS/gaJSApiCampaignTracking.html)
+* [Domains & Directories](http://code.google.com/apis/analytics/docs/gaJS/gaJSApiDomainDirectory.html)
+* [E-Commerce](http://code.google.com/apis/analytics/docs/gaJS/gaJSApiEcommerce.html)
+* [Event Tracking](http://code.google.com/apis/analytics/docs/gaJS/gaJSApiEventTracking.html)
+* [Search Engines and Referrers](http://code.google.com/apis/analytics/docs/gaJS/gaJSApiSearchEngines.html)
+* [Social Interactions](http://code.google.com/apis/analytics/docs/gaJS/gaJSApiSocialTracking.html)
+* [Web Client](http://code.google.com/apis/analytics/docs/gaJS/gaJSApiWebClient.html)
+* [Urchin Server](http://code.google.com/apis/analytics/docs/gaJS/gaJSApiUrchin.html)
+
+
+## Example Project
+
+### `config/application.rb`
+
+    module MyRailsApplication
+      class Application < Rails::Application
+        # ...
+        config.google_analytics_id = "UA-XXXXXXXX-XX"
+        # ...
+      end
+    end
+
+
+### `app/controllers/application_controller.rb`
+
+    class ApplicationController < ActionController::Base
+      # ...
+      include GoogleAnalyticsHelper
+      before_filter :gaq_restore
+      after_filter :gaq_preserve
+      # ...
+    end
+
+
+### `app/controllers/things_controller.rb`
+
+    class ThingsController < ApplicationController
+      # ...
+      def show
+        _trackEvent("ThingsController", "Show", "Thing")
+        @thing = Thing.new
+        @thing.gaq = gaq
+        @thing.test(123)
+      end
+      # ...
+    end
+
+### `app/models/thing.rb`
+
+    class Thing < ActiveRecord::Base
+      # ...
+      include GoogleAnalyticsHelper
+      def test(number)
+        _trackEvent("Thing", "Test", nil, number)
+      end
+      # ...
+    end
+
+
+### `app/views/layouts/application.rb`
+
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <!-- ... -->
+        <%= ga_snippet %>
+      </head>
+      <body>
+        <!-- ... -->
+      </body>
+    </html>
+
+
+### Result
+
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <!-- ... -->
+        <script>var _gaq=[["_setAccount", "UA-XXXXXXXX-X"],["_trackPageview"],["_trackPageLoadTime"],["_trackEvent", "ThingsController", "Show", "Thing", undefined],["_trackEvent", "Thing", "Test", undefined, 123]];(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=true;g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';s.parentNode.insertBefore(g,s)}(document,'script'));</script>
+      </head>
+      <body>
+        <!-- ... -->
+      </body>
+    </html>

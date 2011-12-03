@@ -36,7 +36,7 @@ To set things up, simply specify your Google Analytics ID in the Rails config:
 
     config.google_analytics_id = "UA-XXXXXXXX-XX"
 
-The snippet will then contain the following commands by default: `_setAccount`, `_trackPageview`, `_trackPageLoadTime`  
+The snippet will then contain the following commands by default: `_setAccount`, `_trackPageview`  
 If you need to override this, you can do so by providing a set of default commands:
 
     config.google_analytics_commands = [["_setAccount", "UA-XXXXXXXX-XX"], ["_trackPageview"]]
@@ -44,7 +44,7 @@ If you need to override this, you can do so by providing a set of default comman
 If you specify default commands, you don’t need to specify your ID separately. Just remember to include `_setAccount`.  
 You can make those settings global or environment specific. If you don’t specify either (in one environment), the snippet will not appear (in that environment).
 
-_**Note:** Even if you don't configure GA, all tracking functionality (i.e. pushing and preserving commands) will still work and you can debug it. However, instead of the snippet rendering, the GAQ will simply be cleared at the end of a request._
+_**Note:** Even if you don't configure GA, all tracking functionality (i.e. pushing and preserving commands) will still work and can be debugged. However, instead of rendering the snippet, the helper will simply clear the GAQ at the end of a request._
 
 ### Preserving Commands
 
@@ -196,7 +196,7 @@ Here’s a quick overview of what’s available:
     <html>
       <head>
         <!-- ... -->
-        <script>var _gaq=[["_setAccount", "UA-XXXXXXXX-X"],["_trackPageview"],["_trackPageLoadTime"],["_trackEvent", "ThingsController", "Show", "Thing", undefined],["_trackEvent", "Thing", "Test", undefined, 123]];(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=true;g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';s.parentNode.insertBefore(g,s)}(document,'script'));</script>
+        <script>var _gaq=[["_setAccount", "UA-XXXXXXXX-X"],["_trackPageview"],["_trackEvent", "ThingsController", "Show", "Thing", undefined],["_trackEvent", "Thing", "Test", undefined, 123]];(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=true;g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';s.parentNode.insertBefore(g,s)}(document,'script'));</script>
       </head>
       <body>
         <!-- ... -->

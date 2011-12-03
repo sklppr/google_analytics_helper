@@ -133,7 +133,7 @@ Author: <a href="https://twitter.com/sklppr">@sklppr</a></p>
       </td>
       <td class=code>
         <div class='highlight'><pre>  <span class="k">def</span> <span class="nf">default_gaq</span>
-    <span class="n">config_defaults</span> <span class="o">||</span> <span class="o">[[</span><span class="s2">&quot;_setAccount&quot;</span><span class="p">,</span> <span class="n">config_id</span><span class="o">]</span><span class="p">,</span> <span class="o">[</span><span class="s2">&quot;_trackPageview&quot;</span><span class="o">]</span><span class="p">,</span> <span class="o">[</span><span class="s2">&quot;_trackPageLoadTime&quot;</span><span class="o">]]</span>
+    <span class="n">config_defaults</span> <span class="o">||</span> <span class="o">[[</span><span class="s2">&quot;_setAccount&quot;</span><span class="p">,</span> <span class="n">config_id</span><span class="o">]</span><span class="p">,</span> <span class="o">[</span><span class="s2">&quot;_trackPageview&quot;</span><span class="o">]]</span>
   <span class="k">end</span>
   
   </pre></div>
@@ -342,12 +342,12 @@ Usage: <code>with_opt([param, param, param], opt_param, opt_param)</code></p>
     <span class="n">gaq</span><span class="o">.</span><span class="n">push</span> <span class="o">[</span><span class="s2">&quot;_setSessionCookieTimeout&quot;</span><span class="p">,</span> <span class="n">cookieTimeoutMillis</span><span class="o">]</span>
   <span class="k">end</span>
   
-  <span class="k">def</span> <span class="nf">_setVisitorCookieTimeout</span><span class="p">(</span><span class="n">cookieTimeoutMillis</span><span class="p">)</span>
-    <span class="n">gaq</span><span class="o">.</span><span class="n">push</span> <span class="o">[</span><span class="s2">&quot;_setVisitorCookieTimeout&quot;</span><span class="p">,</span> <span class="n">cookieTimeoutMillis</span><span class="o">]</span>
+  <span class="k">def</span> <span class="nf">_setSiteSpeedSampleRate</span><span class="p">(</span><span class="n">sampleRate</span><span class="p">)</span>
+    <span class="n">gaq</span><span class="o">.</span><span class="n">push</span> <span class="o">[</span><span class="s2">&quot;_setSiteSpeedSampleRate&quot;</span><span class="p">,</span> <span class="n">sampleRate</span><span class="o">]</span>
   <span class="k">end</span>
   
-  <span class="k">def</span> <span class="nf">_trackPageLoadTime</span>
-    <span class="n">gaq</span><span class="o">.</span><span class="n">push</span> <span class="o">[</span><span class="s2">&quot;_trackPageLoadTime&quot;</span><span class="o">]</span>
+  <span class="k">def</span> <span class="nf">_setVisitorCookieTimeout</span><span class="p">(</span><span class="n">cookieTimeoutMillis</span><span class="p">)</span>
+    <span class="n">gaq</span><span class="o">.</span><span class="n">push</span> <span class="o">[</span><span class="s2">&quot;_setVisitorCookieTimeout&quot;</span><span class="p">,</span> <span class="n">cookieTimeoutMillis</span><span class="o">]</span>
   <span class="k">end</span>
   
   <span class="k">def</span> <span class="nf">_trackPageview</span><span class="p">(</span><span class="n">opt_pageURL</span><span class="o">=</span><span class="kp">nil</span><span class="p">)</span>

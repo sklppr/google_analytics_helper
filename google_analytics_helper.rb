@@ -38,7 +38,7 @@ module GoogleAnalyticsHelper
   
   # Default GAQ.
   def default_gaq
-    config_defaults || [["_setAccount", config_id], ["_trackPageview"], ["_trackPageLoadTime"]]
+    config_defaults || [["_setAccount", config_id], ["_trackPageview"]]
   end
   
   
@@ -141,12 +141,12 @@ module GoogleAnalyticsHelper
     gaq.push ["_setSessionCookieTimeout", cookieTimeoutMillis]
   end
   
-  def _setVisitorCookieTimeout(cookieTimeoutMillis)
-    gaq.push ["_setVisitorCookieTimeout", cookieTimeoutMillis]
+  def _setSiteSpeedSampleRate(sampleRate)
+    gaq.push ["_setSiteSpeedSampleRate", sampleRate]
   end
   
-  def _trackPageLoadTime
-    gaq.push ["_trackPageLoadTime"]
+  def _setVisitorCookieTimeout(cookieTimeoutMillis)
+    gaq.push ["_setVisitorCookieTimeout", cookieTimeoutMillis]
   end
   
   def _trackPageview(opt_pageURL=nil)
